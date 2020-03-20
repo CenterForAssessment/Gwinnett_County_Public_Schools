@@ -79,7 +79,7 @@ Gwinnett_SGP <- combineSGP(Gwinnett_SGP)
 
 ###   Step 4.   outputSGP (Write long data with results to working directory)
 
-outputSGP(Gwinnett_SGP)
+outputSGP(Gwinnett_SGP, output.type = c("LONG_Data", "LONG_FINAL_YEAR_Data")) # WIDE still not working with GRADE duplicates
 
 ###   Quick summary of results
 
