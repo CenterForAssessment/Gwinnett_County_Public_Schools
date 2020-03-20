@@ -30,13 +30,13 @@ ALGEBRA_I_2018_2019.2.config <- list(
 
 	ALGEBRA_I.2018_2019.2 = list(
 		sgp.content.areas=c("ACC_MATHEMATICS", "ALGEBRA_I"),
-		sgp.panel.years=c("2018_2019.1", "2018_2019.2"),
+		sgp.panel.years=c("2017_2018.2", "2018_2019.2"),
 		sgp.grade.sequences=list(c("7", "EOCT")),
 		sgp.norm.group.preference=2),
 
 	ALGEBRA_I.2018_2019.2 = list(
 		sgp.content.areas=c("MATHEMATICS", "ALGEBRA_I"),
-		sgp.panel.years=c("2018_2019.1", "2018_2019.2"),
+		sgp.panel.years=c("2017_2018.2", "2018_2019.2"),
 		sgp.grade.sequences=list(c("7", "EOCT")),
 		sgp.norm.group.preference=3)
 )

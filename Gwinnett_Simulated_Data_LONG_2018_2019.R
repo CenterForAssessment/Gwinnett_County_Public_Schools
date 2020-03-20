@@ -10,10 +10,10 @@ require(SGP)
 require(data.table)
 
 ###   Read in simulated data provided by GCPS
-Gwinnett_Data_LONG <- as.data.table(readRDS("./Data/Simulated_Data/sim_gcps_data.rds"))
+Gwinnett_Data_LONG <- as.data.table(readRDS("./Data/Simulated_Data/sim_gcps_data_2020-03-20.rds"))
 
-###   Preserve the CONTENT_AREA data as "Test_Name" - create a duplicate field for now
-Gwinnett_Data_LONG[, Test_Name := CONTENT_AREA]
+###   Preserve the CONTENT_AREA data as "TEST_NAME" - create a duplicate field for now
+Gwinnett_Data_LONG[, TEST_NAME := CONTENT_AREA]
 
 #####
 ###  Create GRADE from CONTENT_AREA
@@ -106,20 +106,22 @@ table(Gwinnett_Data_LONG[!is.na(GRADE), GRADE, CONTENT_AREA]) # Quick Verificati
 ###   Make YEAR consistent for all CONTENT_AREA values
 #####
 
+###   No longer needed - Shanna integrated fixes on GCPS end.
+
 ###   Use the Fall/Spring convention for all values
 ###   Mainly EOG subjects, but also some EOC
 ###   This is something GCPS can probably include in their data prep
 
 ###   Associated CONTENT_AREA values we'll need to change
-table(Gwinnett_Data_LONG[!grepl("[.]", YEAR), YEAR, CONTENT_AREA])
-
-###   Treat all non-labeled YEAR values as '.2' (Spring) assessments
-Gwinnett_Data_LONG[!grepl("[.]", YEAR), YEAR := paste0(YEAR, ".2")]
-
-###   The .F/.S added to years did not work in the studentGrowthPercentiles Function
-###   Change the .F/.S convention to .1/.2
-Gwinnett_Data_LONG[, YEAR := gsub(".F", ".1", YEAR)]
-Gwinnett_Data_LONG[, YEAR := gsub(".S", ".2", YEAR)]
+# table(Gwinnett_Data_LONG[!grepl("[.]", YEAR), YEAR, CONTENT_AREA])
+#
+# ###   Treat all non-labeled YEAR values as '.2' (Spring) assessments
+# Gwinnett_Data_LONG[!grepl("[.]", YEAR), YEAR := paste0(YEAR, ".2")]
+#
+# ###   The .F/.S added to years did not work in the studentGrowthPercentiles Function
+# ###   Change the .F/.S convention to .1/.2
+# Gwinnett_Data_LONG[, YEAR := gsub(".F", ".1", YEAR)]
+# Gwinnett_Data_LONG[, YEAR := gsub(".S", ".2", YEAR)]
 
 table(Gwinnett_Data_LONG[, YEAR, CONTENT_AREA])
 
@@ -133,11 +135,13 @@ Gwinnett_Data_LONG[, VALID_CASE := "VALID_CASE"]
 ###   Remove duplicates.  Why are there SO many?
 ###   Use Georgia's default business rule of taking the highest score
 
-setkey(Gwinnett_Data_LONG, VALID_CASE, CONTENT_AREA, GRADE, YEAR, ID, SCALE_SCORE)
-setkey(Gwinnett_Data_LONG, VALID_CASE, CONTENT_AREA, GRADE, YEAR, ID)
-sum(duplicated(Gwinnett_Data_LONG[VALID_CASE != "INVALID_CASE"], by=key(Gwinnett_Data_LONG))) #
-dups <- data.table(Gwinnett_Data_LONG[unique(c(which(duplicated(Gwinnett_Data_LONG, by=key(Gwinnett_Data_LONG)))-1, which(duplicated(Gwinnett_Data_LONG, by=key(Gwinnett_Data_LONG))))), ], key=key(Gwinnett_Data_LONG))
-Gwinnett_Data_LONG[which(duplicated(Gwinnett_Data_LONG, by=key(Gwinnett_Data_LONG)))-1, VALID_CASE := "INVALID_CASE"]
+###   No longer needed - Shanna integrated fixes on GCPS end.
+
+# setkey(Gwinnett_Data_LONG, VALID_CASE, CONTENT_AREA, GRADE, YEAR, ID, SCALE_SCORE)
+# setkey(Gwinnett_Data_LONG, VALID_CASE, CONTENT_AREA, GRADE, YEAR, ID)
+# sum(duplicated(Gwinnett_Data_LONG[VALID_CASE != "INVALID_CASE"], by=key(Gwinnett_Data_LONG))) #
+# dups <- data.table(Gwinnett_Data_LONG[unique(c(which(duplicated(Gwinnett_Data_LONG, by=key(Gwinnett_Data_LONG)))-1, which(duplicated(Gwinnett_Data_LONG, by=key(Gwinnett_Data_LONG))))), ], key=key(Gwinnett_Data_LONG))
+# Gwinnett_Data_LONG[which(duplicated(Gwinnett_Data_LONG, by=key(Gwinnett_Data_LONG)))-1, VALID_CASE := "INVALID_CASE"]
 
 table(Gwinnett_Data_LONG[, VALID_CASE, YEAR])
 round(prop.table(table(Gwinnett_Data_LONG[, VALID_CASE, YEAR]), 1)*100, 1) # Annual percentage

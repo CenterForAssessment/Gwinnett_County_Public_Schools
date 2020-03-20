@@ -56,7 +56,7 @@ SGPstateData[["GCPS"]][["Growth"]][["Cutscores"]] <-
 
 ###   Step 1.  prepareSGP (Create a SGP object with Long Data)
 
-Gwinnett_SGP <- prepareSGP(Gwinnett_Data_LONG, state="GCPS", create.additional.variables=FALSE)
+Gwinnett_SGP <- prepareSGP(Gwinnett_Data_LONG, create.additional.variables=FALSE)
 
 ###   Step 2.  analyzeSGP (produce SGPs for progressions specified in config scripts)
 
