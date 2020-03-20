@@ -77,6 +77,10 @@ Gwinnett_SGP <- analyzeSGP(
 Gwinnett_SGP <- combineSGP(Gwinnett_SGP)
 
 
+###   Step 4.   outputSGP (Write long data with results to working directory)
+
+outputSGP(Gwinnett_SGP)
+
 ###   Quick summary of results
 
 ###  Simulated data does not have a correlation induced between prior/current!!!
