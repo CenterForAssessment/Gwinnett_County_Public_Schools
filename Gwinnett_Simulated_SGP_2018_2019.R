@@ -10,8 +10,8 @@ require(data.table)
 
 
 ###  Load cleaned long data (from Gwinnett_Simulated_Data_LONG.R)
-load("Data/Simulated_Data/Gwinnett_Data_LONG.Rdata")
-
+#load("Data/Simulated_Data/Gwinnett_Data_LONG.Rdata")
+load("../4_output/datasets/Gwinnett_Data_LONG.Rdata")
 
 ###  Read in 2019 SGP Configuration Scripts (from Github Repo)
 
@@ -56,12 +56,13 @@ SGPstateData[["GCPS"]][["Growth"]][["Cutscores"]] <-
 
 ###   Step 1.  prepareSGP (Create a SGP object with Long Data)
 
-Gwinnett_SGP <- prepareSGP(Gwinnett_Data_LONG, create.additional.variables=FALSE)
+Gwinnett_SGP <- prepareSGP(Gwinnett_Data_LONG, state = 'GCPS', create.additional.variables=FALSE)
 
 ###   Step 2.  analyzeSGP (produce SGPs for progressions specified in config scripts)
 
 Gwinnett_SGP <- analyzeSGP(
   Gwinnett_SGP,
+  state = 'GCPS',
   sgp.config = GCPS.config,
   sgp.percentiles = TRUE,
   sgp.projections = FALSE,
@@ -74,12 +75,13 @@ Gwinnett_SGP <- analyzeSGP(
 
 ###   Step 3.  combineSGP (merge raw results into the long data (@Data slot))
 
-Gwinnett_SGP <- combineSGP(Gwinnett_SGP)
+Gwinnett_SGP <- combineSGP(Gwinnett_SGP, 
+                           state = 'GCPS')
 
 
 ###   Step 4.   outputSGP (Write long data with results to working directory)
 
-outputSGP(Gwinnett_SGP, output.type = c("LONG_Data", "LONG_FINAL_YEAR_Data")) # WIDE still not working with GRADE duplicates
+outputSGP(Gwinnett_SGP,  state = 'GCPS', output.type = c("LONG_Data", "LONG_FINAL_YEAR_Data")) # WIDE still not working with GRADE duplicates
 
 ###   Quick summary of results
 
