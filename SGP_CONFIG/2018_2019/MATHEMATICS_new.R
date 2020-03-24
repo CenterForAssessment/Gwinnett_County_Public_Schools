@@ -39,11 +39,11 @@ ALGEBRA_I_2018_2019.2.config <- list(
     sgp.norm.group.preference=2,
     sgp.exact.grade.progression=TRUE),
   
-	ALGEBRA_I.2018_2019.2 = list(
-		sgp.content.areas=c("ALGEBRA_I", "ALGEBRA_I"),
-		sgp.panel.years=c("2018_2019.1", "2018_2019.2"),
-		sgp.grade.sequences=list(c("EOCT", "EOCT")),
-		sgp.norm.group.preference=3),
+ ALGEBRA_I.2018_2019.2 = list(
+    sgp.content.areas=c("ALGEBRA_I", "ALGEBRA_I"),
+    sgp.panel.years=c("2018_2019.1", "2018_2019.2"),
+    sgp.grade.sequences=list(c("EOCT", "EOCT")),
+    sgp.norm.group.preference=3),
 
   
   ALGEBRA_I.2018_2019.2 = list(
@@ -52,9 +52,9 @@ ALGEBRA_I_2018_2019.2.config <- list(
     sgp.grade.sequences=list(c("7", "EOCT")),
     sgp.norm.group.preference=4),
 
-	ALGEBRA_I.2018_2019.2 = list(
-		sgp.content.areas=c("ACC_MATHEMATICS", "ALGEBRA_I"),
-		sgp.panel.years=c("2017_2018.2", "2018_2019.2"),
-		sgp.grade.sequences=list(c("7", "EOCT")),
-		sgp.norm.group.preference=5)
+  ALGEBRA_I.2018_2019.2 = list(
+    sgp.content.areas=c("ACC_MATHEMATICS", "ALGEBRA_I"),
+    sgp.panel.years=c("2017_2018.2", "2018_2019.2"),
+    sgp.grade.sequences=list(c("7", "EOCT")),
+    sgp.norm.group.preference=5)
 )
