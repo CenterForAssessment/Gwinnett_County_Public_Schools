@@ -76,8 +76,7 @@ Gwinnett_SGP <- analyzeSGP(
 
 ###   Step 3.  combineSGP (merge raw results into the long data (@Data slot))
 
-Gwinnett_SGP <- combineSGP(Gwinnett_SGP,
-                           state = 'GCPS')
+Gwinnett_SGP <- combineSGP(Gwinnett_SGP)
 
 
 ###   Step 4.   outputSGP (Write long data with results to working directory)
