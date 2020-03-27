@@ -16,7 +16,7 @@ MATHEMATICS_2018_2019.2.config <- list(
 	MATHEMATICS.2018_2019.2 = list(
 		sgp.content.areas=c("MATHEMATICS", "MATHEMATICS"),
 		sgp.panel.years=c("2018_2019.1", "2018_2019.2"),
-		sgp.grade.sequences=list(c("6", "6"), c("7", "7"), c("8", "8")),
+		sgp.grade.sequences=list(c("6", "6"), c("7", "7")),
 		sgp.norm.group.preference=2)
 )
 

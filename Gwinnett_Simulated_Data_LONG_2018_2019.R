@@ -146,5 +146,72 @@ Gwinnett_Data_LONG[, VALID_CASE := "VALID_CASE"]
 table(Gwinnett_Data_LONG[, VALID_CASE, YEAR])
 round(prop.table(table(Gwinnett_Data_LONG[, VALID_CASE, YEAR]), 1)*100, 1) # Annual percentage
 
+
+#####
+###   Create ACHIEVEMENT_LEVEL variable
+#####
+
+###   Use boilerplate Achievement Level cutpoints.  Not used but needed for summarizeSGP
+
+Gwinnett_Data_LONG <- SGP:::getAchievementLevel(Gwinnett_Data_LONG, state="GCPS")
+Gwinnett_Data_LONG[, ACHIEVEMENT_LEVEL := factor(ACHIEVEMENT_LEVEL, levels = c("Low", "Typical", "High"), ordered=TRUE)]
+
+table(Gwinnett_Data_LONG[!is.na(ACHIEVEMENT_LEVEL), ACHIEVEMENT_LEVEL, CONTENT_AREA], exclude=NULL)
+Gwinnett_Data_LONG[!is.na(ACHIEVEMENT_LEVEL), as.list(summary(SCALE_SCORE)), keyby=c("CONTENT_AREA", "GRADE", "ACHIEVEMENT_LEVEL")]
+
+
+#####  XXX    XXX    XXX    XXX    XXX    XXX  #####
+#####  XXX    XXX    XXX    XXX    XXX    XXX  #####
+#####                                          #####
+###  Begin Additional Data Simulation Steps      ###
+#####                                          #####
+#####  XXX    XXX    XXX    XXX    XXX    XXX  #####
+#####  XXX    XXX    XXX    XXX    XXX    XXX  #####
+
+#####
+###   Create SCALE_SCORE_CSEM variable (based on simulated CTT reliability)
+#####
+
+###   Calculate standard deviation of the observed scores (across years/semesters)
+Gwinnett_Data_LONG[, SD_O := sd(SCALE_SCORE), by = c("CONTENT_AREA", "GRADE", "YEAR")]
+Gwinnett_Data_LONG[, as.list(summary(SD_O)), keyby = c("CONTENT_AREA", "GRADE", "YEAR")] # should be the same for each row if done right
+
+###   Simulate reliability values for each test - lower for fall semesters
+set.seed(2072)
+Gwinnett_Data_LONG[, RELIABILITY := as.numeric(NA)]
+Gwinnett_Data_LONG[YEAR %in% c("2017_2018.1", "2018_2019.1"), RELIABILITY := sample(seq(0.65, 0.85, 0.01), 1, replace=TRUE), by = c("CONTENT_AREA", "GRADE", "YEAR")]
+Gwinnett_Data_LONG[YEAR %in% c("2017_2018.2", "2018_2019.2"), RELIABILITY := sample(seq(0.75, 0.90, 0.01), 1, replace=TRUE), by = c("CONTENT_AREA", "GRADE", "YEAR")]
+Gwinnett_Data_LONG[, as.list(summary(RELIABILITY)), keyby = c("CONTENT_AREA", "GRADE", "YEAR")] # should be the same for each row if done right
+
+###   Calculate SEM values for each test (constant across all scores)
+Gwinnett_Data_LONG[, SCALE_SCORE_CSEM := SD_O * (1 - RELIABILITY)]
+Gwinnett_Data_LONG[, as.list(summary(SCALE_SCORE_CSEM)), keyby = c("CONTENT_AREA", "GRADE", "YEAR")] # should be the same for each row if done right
+
+###   Remove extraneous variables
+Gwinnett_Data_LONG[, SD_O := NULL]
+Gwinnett_Data_LONG[, RELIABILITY := NULL]
+
+
+#####
+###   Merge in SCHOOL_NUMBER variable (simulated in Gwinnett_Simulated_School_Instructor_Number.R)
+#####
+
+load("Data/Simulated_Data/Gwinnett_Data_SCHOOL_NUMBER.Rdata")
+Gwinnett_Data_LONG[, ID := as.character(ID)]
+setkey(Gwinnett_Data_SCHOOL_NUMBER, ID, GRADE)
+setkey(Gwinnett_Data_LONG, ID, GRADE)
+
+Gwinnett_Data_LONG <- merge(Gwinnett_Data_LONG, Gwinnett_Data_SCHOOL_NUMBER, all.x = TRUE)
+
+
+#####  XXX    XXX    XXX    XXX    XXX    XXX  #####
+#####  XXX    XXX    XXX    XXX    XXX    XXX  #####
+#####                                          #####
+###    END Additional Data Simulation Steps      ###
+#####                                          #####
+#####  XXX    XXX    XXX    XXX    XXX    XXX  #####
+#####  XXX    XXX    XXX    XXX    XXX    XXX  #####
+
+
 ###   Save prepared long data
 save(Gwinnett_Data_LONG, file = "./Data/Simulated_Data/Gwinnett_Data_LONG.Rdata")
