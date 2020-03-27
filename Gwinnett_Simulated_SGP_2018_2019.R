@@ -10,7 +10,7 @@ require(data.table)
 
 
 ###  Load cleaned long data (from Gwinnett_Simulated_Data_LONG.R)
-load("Data/Simulated_Data/Gwinnett_Data_LONG.Rdata")
+load("Data/Simulated_Data/Gwinnett_Data_LONG.Rdata") # load("../4_output/datasets/Gwinnett_Data_LONG.Rdata")
 load("Data/Simulated_Data/Gwinnett_Data_INSTRUCTOR_NUMBER_Weighted.Rdata")
 
 
@@ -60,9 +60,10 @@ names(Gwinnett_SGP@Data_Supplementary[["INSTRUCTOR_NUMBER"]])
 ###   Step 2.  analyzeSGP (produce SGPs for progressions specified in config scripts)
 
  # Added SIMEX calculations - assumes SCALE_SCORE_CSEM Has been calculated from RELIABILITY
- 
+
 Gwinnett_SGP <- analyzeSGP(
   Gwinnett_SGP,
+  state = 'GCPS',
   sgp.config = GCPS.config,
   sgp.percentiles = TRUE,
   sgp.projections = FALSE,
@@ -75,7 +76,8 @@ Gwinnett_SGP <- analyzeSGP(
 
 ###   Step 3.  combineSGP (merge raw results into the long data (@Data slot))
 
-Gwinnett_SGP <- combineSGP(Gwinnett_SGP)
+Gwinnett_SGP <- combineSGP(Gwinnett_SGP,
+                           state = 'GCPS')
 
 
 ###   Step 4.   outputSGP (Write long data with results to working directory)
