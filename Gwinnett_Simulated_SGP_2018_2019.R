@@ -10,7 +10,7 @@ require(data.table)
 
 
 ###  Load cleaned long data (from Gwinnett_Simulated_Data_LONG.R)
-load("Data/Simulated_Data/Gwinnett_Data_LONG.Rdata") # load("../4_output/datasets/Gwinnett_Data_LONG.Rdata")
+load("Data/Simulated_Data/Gwinnett_Data_LONG-Resimulated.Rdata") # load("../4_output/datasets/Gwinnett_Data_LONG.Rdata")
 load("Data/Simulated_Data/Gwinnett_Data_INSTRUCTOR_NUMBER_Weighted.Rdata")
 
 
@@ -71,7 +71,7 @@ Gwinnett_SGP <- analyzeSGP(
   sgp.percentiles.baseline = FALSE,
   sgp.projections.baseline = FALSE,
   sgp.projections.lagged.baseline = FALSE,
-  simulate.sgps=FALSE,
+  simulate.sgps=TRUE,
   calculate.simex = TRUE) # Added SIMEX argument
 
 ###   Step 3.  combineSGP (merge raw results into the long data (@Data slot))
@@ -101,10 +101,10 @@ Gwinnett_SGP <- summarizeSGP(Gwinnett_SGP)
 
 #  Summary tables are located in the @Summary slot.
 names(Gwinnett_SGP@Summary)
-names(Gwinnett_SGP@Summary[["SCHOOL_NUMBER"]])
+names(Gwinnett_SGP@Summary[["STATE"]])
 
 #  Access the Teacher summary table disaggregated by YEAR, CONTENT_AREA and GRADE
-Gwinnett_SGP@Summary[["SCHOOL_NUMBER"]][["SCHOOL_NUMBER__INSTRUCTOR_NUMBER__CONTENT_AREA__YEAR__GRADE"]]
+Gwinnett_SGP@Summary[["STATE"]][["STATE__INSTRUCTOR_NUMBER__CONTENT_AREA__YEAR__GRADE"]]
 
 ###   Save Gwinnett SGP Object
 save(Gwinnett_SGP, file="Data/Simulated_Data/Gwinnett_SGP.Rdata")
