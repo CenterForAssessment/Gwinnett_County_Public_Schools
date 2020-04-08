@@ -150,7 +150,7 @@ df2_sem <- df_full2 %>%
 # get all the course progressions for the year courses
 # getting the most immediate prior
 df2_year <- df_full2 %>%
-  filter(!is.na(SEMESTER)) %>% 
+  filter(is.na(SEMESTER)) %>% 
   group_by(CONTENT_AREA_by_GRADE_PRIOR_YEAR.0, YEAR) %>% 
   mutate(total =sum(COUNT)) %>% 
   ungroup() %>% 
