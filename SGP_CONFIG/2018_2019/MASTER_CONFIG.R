@@ -4,7 +4,7 @@
 ###                                                                          ###
 ################################################################################
 
-source("Gwinnett_Course_Progressions_2018_2019.R")
+#source("Gwinnett_Course_Progressions_2018_2019.R")
 
 ### could maybe just select the top one in each progression to do
 # would include rules here about which ones should be run
@@ -17,16 +17,14 @@ df_to_run <- df2 %>%
   mutate(s = as.integer(row_number() == 1L)) %>% 
   ungroup() %>% 
   filter(s == 1) %>% 
-  filter(ct>=1200)
-
+  filter(ct>=1200) 
 
 tests_spring <- df_to_run %>% 
   filter(YEAR == "2018_2019.2") %>% 
   ungroup() %>% 
   distinct(CONTENT_AREA_by_GRADE_PRIOR_YEAR.0) %>% 
-  filter(CONTENT_AREA_by_GRADE_PRIOR_YEAR.0 != "BIOLOGY.EOCT")%>% 
-  # BIOLOGY WAS BREAKING IT THEN IT BROKE AGAIN
-  # Singular design matrix error
+  filter(CONTENT_AREA_by_GRADE_PRIOR_YEAR.0 != "AP_HUMAN_GEOGRAPHY.EOCT")%>% 
+  #AP_HUMAN_GEOGRAPHY.EOCT was breaking it by throwing a Singular design matrix error
   pull(CONTENT_AREA_by_GRADE_PRIOR_YEAR.0) 
 
 tests_fall <- df_to_run %>% 
