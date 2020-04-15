@@ -14,7 +14,7 @@ library(readxl)
 
 ###  Combine long data from Spring 2019 analyses with Fall 2019 (NJ only) data
 #load("Data/Simulated_Data/Gwinnett_Data_LONG.Rdata")
-load("../4_output/datasets/Gwinnett_Data_LONG.Rdata")
+load("S:/Superintendent/Private/Strategy & Performance/ResearchEvaluation/Shanna Ricketts/Data Analysis/2019-20 Analysis/exploration/Student Growth Exploration/4_output/datasets/Gwinnett_Data_LONG.Rdata")
 
 # Code from Shanna to make one master configuration file (04/07/2020)
 # gives the subject mapped to test names
@@ -24,8 +24,8 @@ load("../4_output/datasets/Gwinnett_Data_LONG.Rdata")
 #          SUBJECT = subject) %>% 
 #   distinct()
 #saveRDS(test_subject_mapping, "../4_output/datasets/test_subject_mapping.RDS")
-test_subject_mapping <- readRDS("../4_output/datasets/test_subject_mapping.RDS")
-assessedsubject_to_sgpname <- readRDS("../4_output/datasets/assessedsubject_to_sgpname.rds")
+test_subject_mapping <- readRDS("S:/Superintendent/Private/Strategy & Performance/ResearchEvaluation/Shanna Ricketts/Data Analysis/2019-20 Analysis/4_output/datasets/test_subject_mapping.RDS")
+assessedsubject_to_sgpname <- readRDS("S:/Superintendent/Private/Strategy & Performance/ResearchEvaluation/Shanna Ricketts/Data Analysis/2019-20 Analysis/4_output/datasets/assessedsubject_to_sgpname.rds")
 
 # adding in additional columns that will be needed to loop through
 # and create configuration script
