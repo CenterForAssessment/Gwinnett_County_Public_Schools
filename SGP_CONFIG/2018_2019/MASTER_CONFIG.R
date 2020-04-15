@@ -4,7 +4,7 @@
 ###                                                                          ###
 ################################################################################
 
-#source("Gwinnett_Course_Progressions_2018_2019.R")
+source("Gwinnett_Course_Progressions_2018_2019.R")
 
 ### could maybe just select the top one in each progression to do
 # would include rules here about which ones should be run
@@ -18,6 +18,11 @@ df_to_run <- df2 %>%
   ungroup() %>% 
   filter(s == 1) %>% 
   filter(ct>=1200) 
+# %>% 
+#   # 04/10/2020 going to try out a small subset to see if I can get things to work
+#   filter(CONTENT_AREA_by_GRADE_PRIOR_YEAR.0 %in% c("MATHEMATICS.03",
+#                                                    "MATHEMATICS.04",
+#                                                    "MATHEMATICS.05"))
 
 tests_spring <- df_to_run %>% 
   filter(YEAR == "2018_2019.2") %>% 
