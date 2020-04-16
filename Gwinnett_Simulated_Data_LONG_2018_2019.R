@@ -153,6 +153,17 @@ round(prop.table(table(Gwinnett_Data_LONG[, VALID_CASE, YEAR]), 1)*100, 1) # Ann
 
 ###   Use boilerplate Achievement Level cutpoints.  Not used but needed for summarizeSGP
 
+grd.subj <- unique(Gwinnett_Data_LONG[, list(CONTENT_AREA, GRADE)])
+setkey(grd.subj)
+gcps.cutscores <- list()
+
+for (ca in unique(grd.subj$CONTENT_AREA)) {
+	tmp.dt <- grd.subj[CONTENT_AREA == ca]
+	for (j in paste0("GRADE_", tmp.dt$GRADE)) gcps.cutscores[[ca]][[j]] <- c(40, 60)
+}
+
+SGPstateData[["GCPS"]][["Achievement"]][["Cutscores"]] <- gcps.cutscores
+
 Gwinnett_Data_LONG <- SGP:::getAchievementLevel(Gwinnett_Data_LONG, state="GCPS")
 Gwinnett_Data_LONG[, ACHIEVEMENT_LEVEL := factor(ACHIEVEMENT_LEVEL, levels = c("Low", "Typical", "High"), ordered=TRUE)]
 

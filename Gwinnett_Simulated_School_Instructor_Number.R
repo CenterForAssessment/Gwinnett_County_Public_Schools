@@ -13,7 +13,7 @@ load("./Data/Simulated_Data/Gwinnett_SGP_LONG_Data.Rdata")
 ###   Elementary Schools
 
 #  Create SCHOOL_NUMBER
-base.elem <- Gwinnett_SGP_LONG_Data[CONTENT_AREA %in% c("LANGUAGE_ARTS", "MATHEMATICS") & GRADE %in% 1:5 & YEAR == "2018_2019.2", list(ID, YEAR)] # , CONTENT_AREA, GRADE
+base.elem <- Gwinnett_SGP_LONG_Data[CONTENT_AREA %in% c("LANGUAGE_ARTS", "MATHEMATICS", "SOCIAL_STUDIES", "SCIENCE") & GRADE %in% 1:5 & YEAR == "2018_2019.2", list(ID, YEAR)] # , CONTENT_AREA, GRADE
 setkey(base.elem)
 base.elem <- unique(base.elem)
 dim(base.elem)
@@ -30,8 +30,14 @@ elem.schools <- rbindlist(list(copy(elem.schools)[, GRADE := "1"], copy(elem.sch
 
 ###   Middle Schools
 
-base.mid1 <- Gwinnett_SGP_LONG_Data[CONTENT_AREA %in% c("LANGUAGE_ARTS", "MATHEMATICS") & GRADE %in% 6:8, list(ID, YEAR)] # , GRADE, CONTENT_AREA
-base.mid2 <- Gwinnett_SGP_LONG_Data[CONTENT_AREA == "ALGEBRA_I" & !is.na(SGP), list(ID, YEAR)] # , GRADE
+base.mid1 <- Gwinnett_SGP_LONG_Data[CONTENT_AREA %in% c("LANGUAGE_ARTS", "MATHEMATICS", "ACC_MATHEMATICS", "SOCIAL_STUDIES", "SCIENCE") & GRADE %in% 6:8, list(ID, YEAR)] # , GRADE, CONTENT_AREA
+# base.mid2 <- Gwinnett_SGP_LONG_Data[!is.na(SGP), list(ID, YEAR)] # CONTENT_AREA == "ALGEBRA_I" &
+base.eoct <- Gwinnett_SGP_LONG_Data[!is.na(SGP) & GRADE == "EOCT", list(ID, YEAR, CONTENT_AREA)] # CONTENT_AREA == "ALGEBRA_I" &
+mid.eoct <- base.eoct[ID %in% unique(base.mid1$ID)]
+hs.eoct <- base.eoct[!ID %in% unique(base.mid1$ID)]
+
+base.mid2 <- unique(mid.eoct[, list(ID, YEAR)])
+
 base.mid <- rbindlist(list(base.mid1, base.mid2))
 setkey(base.mid)
 base.mid <- unique(base.mid)
@@ -45,7 +51,19 @@ mid.numbs <- rep(201:230, times= mid.size)
 mid.schools <- data.table(ID = unique(base.mid$ID), SCHOOL_NUMBER = sample(mid.numbs, length(unique(base.mid$ID)), replace = TRUE))  # Add GRADE merge?
 mid.schools <- rbindlist(list(copy(mid.schools)[, GRADE := "6"], copy(mid.schools)[, GRADE := "7"], copy(mid.schools)[, GRADE := "8"], copy(mid.schools)[, GRADE := "EOCT"]))
 
-Gwinnett_Data_SCHOOL_NUMBER <- rbindlist(list(elem.schools, mid.schools))
+
+base.hs <- unique(hs.eoct[, list(ID, YEAR)])
+dim(base.hs)
+table(base.hs[, YEAR])
+
+set.seed(589)
+hs.size <- sample(seq(750, 2500, 1), 20)
+sum(hs.size) # need close to 45,000
+hs.numbs <- rep(3001:3020, times= hs.size)
+hs.schools <- data.table(ID = unique(base.hs$ID), SCHOOL_NUMBER = sample(hs.numbs, length(unique(base.hs$ID)), replace = TRUE))  # Add GRADE merge?
+hs.schools[, GRADE := "EOCT"]
+
+Gwinnett_Data_SCHOOL_NUMBER <- rbindlist(list(elem.schools, mid.schools, hs.schools))
 
 save(Gwinnett_Data_SCHOOL_NUMBER, file="Data/Simulated_Data/Gwinnett_Data_SCHOOL_NUMBER.Rdata")
 
@@ -82,29 +100,33 @@ table(elem.schools.tchr[, GRADE, is.na(INSTRUCTOR_NUMBER)])
 ###   Middle School Teachers
 
 set.seed(589)
-mid.schools.tchr <- data.table(ID = unique(base.mid$ID), SCHOOL_NUMBER = sample(mid.numbs, length(unique(base.mid$ID)), replace = TRUE))
-mid.schools.tchr <- rbindlist(list(
-                   copy(mid.schools.tchr)[, GRADE := "6"][, CONTENT_AREA := "LANGUAGE_ARTS"],
-                   copy(mid.schools.tchr)[, GRADE := "7"][, CONTENT_AREA := "LANGUAGE_ARTS"],
-                   copy(mid.schools.tchr)[, GRADE := "8"][, CONTENT_AREA := "LANGUAGE_ARTS"],
-                   copy(mid.schools.tchr)[, GRADE := "6"][, CONTENT_AREA := "MATHEMATICS"],
-                   copy(mid.schools.tchr)[, GRADE := "7"][, CONTENT_AREA := "MATHEMATICS"],
-                   copy(mid.schools.tchr)[, GRADE := "8"][, CONTENT_AREA := "MATHEMATICS"],
-                   copy(mid.schools.tchr)[, GRADE := "EOCT"][, CONTENT_AREA := "ALGEBRA_I"]))
+
+grd.subj.lookup <- rbind(
+  CJ(GRADE=as.character(6:8), CONTENT_AREA=c("LANGUAGE_ARTS", "MATHEMATICS", "ACC_MATHEMATICS", "SOCIAL_STUDIES", "SCIENCE")),
+  CJ(GRADE="EOCT", CONTENT_AREA=unique(mid.eoct$CONTENT_AREA))
+)
+mid.schools.tchr <- grd.subj.lookup[mid.schools, on="GRADE", allow.cartesian=TRUE]
 
 setkey(mid.schools.tchr)
 
 for (sch.id in unique(mid.schools.tchr[, SCHOOL_NUMBER])) {
   stu.lookup <- mid.schools.tchr[SCHOOL_NUMBER == sch.id]
-  for (ca in c("LANGUAGE_ARTS", "MATHEMATICS")){
+  for (ca in c("LANGUAGE_ARTS", "MATHEMATICS", "ACC_MATHEMATICS", "SOCIAL_STUDIES", "SCIENCE")){
+    ca.abv <- strsplit(ca, "_")[[1]]
+    if(length(strsplit(ca, "_")[[1]])==1) {
+
+    } else {
+      ca.abv <- sapply(ca.abv, function(f) substr(f, 1,1), USE.NAMES = FALSE)
+    }
     num.tchrs <- ceiling(as.numeric(table(stu.lookup[CONTENT_AREA == ca, GRADE]))/75)+1
     for (g in 6:8) {
       stu.lookup[GRADE == g & CONTENT_AREA == ca, INSTRUCTOR_NUMBER := sample(paste(sch.id, paste0(substr(ca, 1,1), g), 1:num.tchrs[which(g == 6:8)], sep="_"), .N, replace = TRUE)]
     }
   }
-  ca <- "ALGEBRA_I"; g <- "EOCT"
-  num.tchrs <- ceiling(as.numeric(table(stu.lookup[CONTENT_AREA == ca, GRADE]))/75)+1
-  stu.lookup[SCHOOL_NUMBER == sch.id & GRADE == g & CONTENT_AREA == ca, INSTRUCTOR_NUMBER := sample(paste(sch.id, "ALG", 1:num.tchrs, sep="_"), .N, replace = TRUE)]
+  for (ca in unique(mid.eoct$CONTENT_AREA)) {
+    num.tchrs <- ceiling(as.numeric(table(stu.lookup[CONTENT_AREA == ca, GRADE]))/75)+1
+    stu.lookup[SCHOOL_NUMBER == sch.id & GRADE == "EOCT" & CONTENT_AREA == ca, INSTRUCTOR_NUMBER := sample(paste(sch.id, "ALG", 1:num.tchrs, sep="_"), .N, replace = TRUE)]
+  }
 
   setkeyv(stu.lookup, key(mid.schools.tchr))
   mid.schools.tchr <- mid.schools.tchr[stu.lookup, INSTRUCTOR_NUMBER := i.INSTRUCTOR_NUMBER] # , on = .(ID, SCHOOL_NUMBER, GRADE)

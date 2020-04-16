@@ -14,9 +14,9 @@ load("./Data/Simulated_Data/Gwinnett_SGP_LONG_Data.Rdata")
 
 #  Subset only the data that will be used for preliminary analyses
 sim.ids <- Gwinnett_SGP_LONG_Data[!is.na(SGP), ID]
-sim.data.long1 <- Gwinnett_SGP_LONG_Data[ID %in% sim.ids & CONTENT_AREA %in% c("LANGUAGE_ARTS", "MATHEMATICS", "ALGEBRA_I"), list(VALID_CASE, ID, YEAR, CONTENT_AREA, GRADE, SCALE_SCORE)]
-sim.data.long2 <- Gwinnett_SGP_LONG_Data[ID %in% sim.ids & CONTENT_AREA == "ACC_MATHEMATICS" & YEAR == "2017_2018.2", list(VALID_CASE, ID, YEAR, CONTENT_AREA, GRADE, SCALE_SCORE)]
-sim.data.long <- rbindlist(list(sim.data.long1, sim.data.long2))
+sim.data.long <- Gwinnett_SGP_LONG_Data[ID %in% sim.ids, list(VALID_CASE, ID, YEAR, CONTENT_AREA, GRADE, SCALE_SCORE)]
+# sim.data.long2 <- Gwinnett_SGP_LONG_Data[ID %in% sim.ids & CONTENT_AREA == "ACC_MATHEMATICS" & YEAR == "2017_2018.2", list(VALID_CASE, ID, YEAR, CONTENT_AREA, GRADE, SCALE_SCORE)]
+# sim.data.long <- rbindlist(list(sim.data.long1, sim.data.long2))
 setkeyv(sim.data.long, SGP:::getKey(sim.data.long))
 
 #  Create blank new data.table to populate with re-simulated data
@@ -29,9 +29,13 @@ source("SGP_CONFIG/Data_Simulation/MATHEMATICS_SIM.R")
 source("SGP_CONFIG/Data_Simulation/LANGUAGE_ARTS_SIM.R")
 
 ###   Combine Basic Configuration Scripts
+
+config_list2 <- config_list[!sapply(config_list, function(f) any(grepl("\\<ALGEBRA_I\\>|\\<MATHEMATICS\\>|\\<LANGUAGE_ARTS\\>", f)))]
+
 GCPS.config <- c(
   LANGUAGE_ARTS_2018_2019.2.config,
-  MATHEMATICS_2018_2019.2.config)
+  MATHEMATICS_2018_2019.2.config, config_list2)
+
 
 
 ###   Re-simulate Math and LA with single priors
@@ -213,7 +217,7 @@ table(Gwinnett_Data_LONG[, is.na(SCHOOL_NUMBER), CONTENT_AREA])
 ###   Save re-simulated data object
 #####
 
-save(Gwinnett_Data_LONG, file = "./Data/Simulated_Data/Gwinnett_Data_LONG-Resimulated.Rdata")
+save(Gwinnett_Data_LONG, file = "./Data/Simulated_Data/Gwinnett_Data_LONG-Resimulated2.Rdata")
 
 
 ######

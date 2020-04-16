@@ -24,6 +24,9 @@ source("SGP_CONFIG/2018_2019/MASTER_CONFIG.R")
 #   LANGUAGE_ARTS_2018_2019.2.config,
 #   MATHEMATICS_2018_2019.2.config,
 #   ALGEBRA_I_2018_2019.2.config)
+
+# load("Data/Simulated_Data/config_list.rda")
+
 GCPS.config <- c(
   config_list
 )
@@ -79,13 +82,13 @@ Gwinnett_SGP <- analyzeSGP(
 
 ###   Step 3.  combineSGP (merge raw results into the long data (@Data slot))
 
-Gwinnett_SGP <- combineSGP(Gwinnett_SGP, 
+Gwinnett_SGP <- combineSGP(Gwinnett_SGP,
                            state = 'GCPS')
 
 
 ###   Step 4.   outputSGP (Write long data with results to working directory)
 
-outputSGP(Gwinnett_SGP,  state = 'GCPS', output.type = c("LONG_Data", "LONG_FINAL_YEAR_Data")) # WIDE still not working with GRADE duplicates
+outputSGP(Gwinnett_SGP,  outputSGP.directory="./Data/Simulated_Data", output.type = c("LONG_Data", "LONG_FINAL_YEAR_Data")) # WIDE still not working with GRADE duplicates
 
 ###   Quick summary of results
 
