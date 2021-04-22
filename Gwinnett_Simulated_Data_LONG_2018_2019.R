@@ -8,11 +8,12 @@
 
 require(SGP)
 require(data.table)
+library(tidyverse)
 
 ###   Read in simulated data provided by GCPS
 Gwinnett_Data_LONG <- as.data.table(readRDS("./Data/Simulated_Data/sim_gcps_data_2020-03-20.rds"))
 
-###   Preserve the CONTENT_AREA data as "TEST_NAME" - create a duplicate field for now
+###   Preserve the CONTENT_AREA data as "TEST_NAME" - create a duplicate field
 Gwinnett_Data_LONG[, TEST_NAME := CONTENT_AREA]
 
 #####
@@ -126,6 +127,21 @@ table(Gwinnett_Data_LONG[!is.na(GRADE), GRADE, CONTENT_AREA]) # Quick Verificati
 table(Gwinnett_Data_LONG[, YEAR, CONTENT_AREA])
 
 
+###   Map test subject on to data based on TEST_NAME
+test_subject_mapping <- readRDS("Data/Simulated_Data/mapping_files/test_subject_mapping.RDS")
+
+Gwinnett_Data_LONG <- Gwinnett_Data_LONG %>%
+  left_join(test_subject_mapping,
+            by = c("TEST_NAME" = "TEST_NAME")) %>%
+  mutate(SUBJECT = str_replace_all(SUBJECT, " ", "_")) %>%
+  mutate(SUBJECT = toupper(SUBJECT)) %>%
+  mutate(list_name = ifelse(GRADE == "EOCT",
+                            paste0(CONTENT_AREA, ".", GRADE),
+                            paste0(CONTENT_AREA, ".0", GRADE)))
+
+Gwinnett_Data_LONG <- data.table(Gwinnett_Data_LONG)
+table(Gwinnett_Data_LONG[, SUBJECT, CONTENT_AREA], exclude=NULL)
+
 #####
 ###   Create VALID_CASE variable
 #####
@@ -207,12 +223,14 @@ Gwinnett_Data_LONG[, RELIABILITY := NULL]
 ###   Merge in SCHOOL_NUMBER variable (simulated in Gwinnett_Simulated_School_Instructor_Number.R)
 #####
 
-load("Data/Simulated_Data/Gwinnett_Data_SCHOOL_NUMBER.Rdata")
-Gwinnett_Data_LONG[, ID := as.character(ID)]
-setkey(Gwinnett_Data_SCHOOL_NUMBER, ID, GRADE)
-setkey(Gwinnett_Data_LONG, ID, GRADE)
+###   Gwinnett does not want SCHOOL_NUMBER included
 
-Gwinnett_Data_LONG <- merge(Gwinnett_Data_LONG, Gwinnett_Data_SCHOOL_NUMBER, all.x = TRUE)
+# load("Data/Simulated_Data/Gwinnett_Data_SCHOOL_NUMBER.Rdata")
+# Gwinnett_Data_LONG[, ID := as.character(ID)]
+# setkey(Gwinnett_Data_SCHOOL_NUMBER, ID, GRADE)
+# setkey(Gwinnett_Data_LONG, ID, GRADE)
+#
+# Gwinnett_Data_LONG <- merge(Gwinnett_Data_LONG, Gwinnett_Data_SCHOOL_NUMBER, all.x = TRUE)
 
 
 #####  XXX    XXX    XXX    XXX    XXX    XXX  #####

@@ -25,8 +25,8 @@ Gwinnett_Data_LONG <- data.table()
 
 ###  Read in Data simulation configuration scripts (from Github Repo)
 
-source("SGP_CONFIG/Data_Simulation/MATHEMATICS_SIM.R")
-source("SGP_CONFIG/Data_Simulation/LANGUAGE_ARTS_SIM.R")
+# source("SGP_CONFIG/Data_Simulation/MATHEMATICS_SIM.R")
+# source("SGP_CONFIG/Data_Simulation/LANGUAGE_ARTS_SIM.R")
 
 ###   Combine Basic Configuration Scripts
 
@@ -87,7 +87,7 @@ for (cfg in seq(GCPS.config)) {
   }
 }
 
-table(Gwinnett_Data_LONG[, CONTENT_AREA, GRADE])
+table(Gwinnett_Data_LONG[, GRADE, CONTENT_AREA])
 
 #####
 ###   Run 'special' case configs for current year scores that might have multiple possible priors
@@ -155,8 +155,8 @@ for (cfg in seq(GCPS.mult.config)) {
   Gwinnett_Data_LONG <- rbindlist(list(Gwinnett_Data_LONG, tmp.data.long))
 }
 
-table(Gwinnett_Data_LONG[, CONTENT_AREA, GRADE])
-table(Gwinnett_Data_LONG[, CONTENT_AREA, YEAR])
+table(Gwinnett_Data_LONG[, GRADE, CONTENT_AREA])
+table(Gwinnett_Data_LONG[, YEAR, CONTENT_AREA])
 
 
 #####
@@ -191,11 +191,26 @@ Gwinnett_Data_LONG[, RELIABILITY := NULL]
 
 Gwinnett_Data_LONG[, VALID_CASE := "VALID_CASE"]
 
+###   Use boilerplate Achievement Level cutpoints.  Not used but needed for summarizeSGP
+
+grd.subj <- unique(Gwinnett_Data_LONG[, list(CONTENT_AREA, GRADE)])
+setkey(grd.subj)
+gcps.cutscores <- list()
+
+for (ca in unique(grd.subj$CONTENT_AREA)) {
+	tmp.dt <- grd.subj[CONTENT_AREA == ca]
+	for (j in paste0("GRADE_", tmp.dt$GRADE)) gcps.cutscores[[ca]][[j]] <- c(40, 60)
+}
+
+SGPstateData[["GCPS"]][["Achievement"]][["Cutscores"]] <- gcps.cutscores
+
 Gwinnett_Data_LONG <- SGP:::getAchievementLevel(Gwinnett_Data_LONG, state="GCPS")
 Gwinnett_Data_LONG[, ACHIEVEMENT_LEVEL := factor(ACHIEVEMENT_LEVEL, levels = c("Low", "Typical", "High"), ordered=TRUE)]
 
 table(Gwinnett_Data_LONG[!is.na(ACHIEVEMENT_LEVEL), ACHIEVEMENT_LEVEL, CONTENT_AREA], exclude=NULL)
 Gwinnett_Data_LONG[!is.na(ACHIEVEMENT_LEVEL), as.list(summary(SCALE_SCORE)), keyby=c("CONTENT_AREA", "GRADE", "ACHIEVEMENT_LEVEL")]
+
+Gwinnett_Data_LONG[, ACHIEVEMENT_LEVEL := as.character(ACHIEVEMENT_LEVEL)]
 
 
 #####
